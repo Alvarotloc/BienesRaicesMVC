@@ -2,11 +2,10 @@ import express from 'express';
 
 const router = express.Router();
 
-router.get('/', (req, res) => {
-    res.send('<h1>Hola mundo</h1>')
-})
-router.get('/nosotros', (req, res) => {
-    res.send('<h1>Hola papai</h1>')
+router.get('/login', (req, res) => {
+    res.render('auth/login', {
+        autenticado: false
+    })
 })
 
 export default router;
