@@ -1,11 +1,11 @@
-import express from 'express';
+import express from 'express'
 
-const router = express.Router();
+const router = express.Router()
 
 router.get('/login', (req, res) => {
-    res.render('auth/login', {
-        autenticado: false
-    })
+  res.render('auth/login', {
+    autenticado: false
+  })
 })
 
-export default router;
+export default router
