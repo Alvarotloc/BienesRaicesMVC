@@ -5,8 +5,12 @@ import db from './config/db.js'
 // Crear la app
 const app = express()
 
+// Habilitar bodyparser
+app.use(express.urlencoded({ extended: true }))
+
 try {
   await db.authenticate()
+  db.sync()
   console.log('Conexión correcta a la bbdd')
 } catch (error) {
   console.log(error)

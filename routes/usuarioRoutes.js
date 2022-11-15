@@ -3,13 +3,16 @@ import express from 'express'
 import {
   formularioLogin,
   formularioRegistro,
-  formularioOlvidePassword
+  formularioOlvidePassword,
+  registrarUsuario
 } from '../controllers/usuarioController.js'
 
 const router = express.Router()
 
 router.get('/login', formularioLogin)
-router.get('/registro', formularioRegistro)
+router.route('/registro')
+  .get(formularioRegistro)
+  .post(registrarUsuario)
 router.get('/olvide-password', formularioOlvidePassword)
 
 export default router
