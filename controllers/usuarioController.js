@@ -1,13 +1,61 @@
 import { check, validationResult } from 'express-validator'
 import bcrypt from 'bcrypt'
+
 import { emailRegistro, emailOlvidePassword } from '../helpers/email.js'
-import { generarId } from '../helpers/tokens.js'
+import { generarId, generarJWT } from '../helpers/tokens.js'
 import Usuario from '../models/Usuario.js'
 
 const formularioLogin = (req, res) => {
   res.render('auth/login', {
-    title: 'Iniciar Sesión'
+    title: 'Iniciar Sesión',
+    csrfToken: req.csrfToken()
   })
+}
+
+const autenticarUsuario = async (req, res) => {
+  await check('email').isEmail().trim().withMessage('Introduce un email correcto').run(req)
+  await check('password').notEmpty().withMessage('La contraseña es obligatoria').run(req)
+
+  const resultado = validationResult(req)
+
+  if (!resultado.isEmpty()) {
+    // Errores
+    return res.render('auth/login', {
+      title: 'Iniciar Sesión',
+      errores: resultado.array(),
+      csrfToken: req.csrfToken()
+    })
+  }
+
+  const { email, password } = req.body
+
+  const usuario = await Usuario.findOne({ where: { email } })
+  if (!usuario) {
+    return res.render('auth/login', {
+      title: 'Iniciar Sesión',
+      errores: [{ msg: 'No existe ningún usuario con ese email' }],
+      csrfToken: req.csrfToken()
+    })
+  }
+  if (!usuario.confirmado) {
+    return res.render('auth/login', {
+      title: 'Iniciar Sesión',
+      errores: [{ msg: 'El usuario no está autenticado' }],
+      csrfToken: req.csrfToken()
+    })
+  }
+  if (!usuario.verificarPassword(password)) {
+    return res.render('auth/login', {
+      title: 'Iniciar Sesión',
+      errores: [{ msg: 'La contraseña es incorrecta' }],
+      csrfToken: req.csrfToken()
+    })
+  }
+  const token = generarJWT({ id: usuario.id, nombre: usuario.nombre })
+  return res.cookie('_token', token, {
+    httpOnly: true
+    // secure: true
+  }).redirect('/mis-propiedades')
 }
 
 const formularioRegistro = (req, res) => {
@@ -198,5 +246,6 @@ export {
   confirmarToken,
   resetPassword,
   comprobarToken,
-  nuevoPassword
+  nuevoPassword,
+  autenticarUsuario
 }

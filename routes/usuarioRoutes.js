@@ -8,12 +8,16 @@ import {
   confirmarToken,
   resetPassword,
   comprobarToken,
-  nuevoPassword
+  nuevoPassword,
+  autenticarUsuario
 } from '../controllers/usuarioController.js'
 
 const router = express.Router()
 
 router.get('/login', formularioLogin)
+router.route('/login')
+  .get(formularioLogin)
+  .post(autenticarUsuario)
 
 router.route('/registro')
   .get(formularioRegistro)
