@@ -29,7 +29,34 @@ const emailRegistro = async (data) => {
     `
   })
 }
+const emailOlvidePassword = async (data) => {
+  const transport = nodemailer.createTransport({
+    host: process.env.EMAIL_HOST,
+    port: process.env.EMAIL_PORT,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS
+    }
+  })
+  const { email, nombre, token } = data
+  await transport.sendMail({
+    from: 'info@bienesraices.com',
+    to: email,
+    subject: 'Reestablece tu contraseña en Bienes Raices',
+    text: 'Reestablece tu contraseña en Bienes Raices',
+    html: `
+        <p>Hola ${nombre}, has solicitado reestablecer tu password en Bienes Raices</p>
+
+        <p>Sigue el siguiente enlace para generar una nueva contraseña: 
+        <a href="${process.env.BACKEND_URL}:${process.env.PORT ?? 4000}/auth/olvide-password/${token}">Reestablecer Contraseña</a>
+        </p>
+
+        <p>Si tu no pediste este cambio puedes ignorar este email</p>
+    `
+  })
+}
 
 export {
-  emailRegistro
+  emailRegistro,
+  emailOlvidePassword
 }

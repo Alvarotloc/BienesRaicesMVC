@@ -1,5 +1,6 @@
 import { check, validationResult } from 'express-validator'
-import { emailRegistro } from '../helpers/email.js'
+import bcrypt from 'bcrypt'
+import { emailRegistro, emailOlvidePassword } from '../helpers/email.js'
 import { generarId } from '../helpers/tokens.js'
 import Usuario from '../models/Usuario.js'
 
@@ -71,7 +72,7 @@ const registrarUsuario = async (req, res) => {
 
   res.render('templates/mensaje', {
     title: 'Cuenta Creada Correctamente',
-    mensaje: 'Hemos enviado un email de confirmación, presiona en el enlace'
+    mensaje: 'Hemos enviado un email de confirmación, revisa tu correo para confirmar tu cuenta'
   })
 }
 
@@ -101,7 +102,91 @@ const confirmarToken = async (req, res) => {
 
 const formularioOlvidePassword = (req, res) => {
   res.render('auth/olvide-password', {
-    title: 'Recupera Tu Contraseña'
+    title: 'Recupera Tu Contraseña',
+    csrfToken: req.csrfToken()
+  })
+}
+
+const resetPassword = async (req, res) => {
+  await check('email').isEmail().trim().withMessage('Introduce un email correcto').run(req)
+
+  const resultado = validationResult(req)
+
+  if (!resultado.isEmpty()) {
+    // Errores
+    return res.render('auth/olvide-password', {
+      title: 'Recupera Tu Contraseña',
+      errores: resultado.array(),
+      csrfToken: req.csrfToken()
+    })
+  }
+  const { email } = req.body
+  const usuario = await Usuario.findOne({ where: { email } })
+  if (!usuario) {
+    return res.render('auth/olvide-password', {
+      title: 'Recupera Tu Contraseña',
+      errores: [{ msg: 'No existe usuario con ese email' }],
+      csrfToken: req.csrfToken()
+    })
+  }
+  usuario.token = generarId()
+  await usuario.save()
+
+  emailOlvidePassword({
+    email: usuario.email,
+    nombre: usuario.nombre,
+    token: usuario.token
+  })
+
+  res.render('templates/mensaje', {
+    title: 'Reestablece Tu Password',
+    mensaje: 'Hemos enviado un email con las instrucciones'
+  })
+}
+
+const comprobarToken = async (req, res, next) => {
+  const { token } = req.params
+  const usuario = await Usuario.findOne({ where: { token } })
+  if (!usuario) {
+    return res.render('auth/confirmar-cuenta', {
+      title: 'Error al confirmar tu cuenta',
+      mensaje: 'Lo sentimos, el token utilizado no existe o ya ha sido utilizado',
+      error: true,
+      csrfToken: req.csrfToken()
+    })
+  }
+
+  res.render('auth/nueva-password', {
+    title: 'Recuperar Password',
+    csrfToken: req.csrfToken()
+  })
+}
+const nuevoPassword = async (req, res) => {
+  await check('password').isLength({ min: 6 }).withMessage('La contraseña debe ser de al menos 6 caracteres').run(req)
+  await check('confirm').equals(req.body.password).withMessage('La contraseñas no coinciden').run(req)
+
+  const resultado = validationResult(req)
+
+  if (!resultado.isEmpty()) {
+    // Errores
+    return res.render('auth/nueva-password', {
+      title: 'Recuperar Password',
+      errores: resultado.array(),
+      csrfToken: req.csrfToken()
+    })
+  }
+
+  const { token } = req.params
+
+  const usuario = await Usuario.findOne({ where: { token } })
+
+  const salt = await bcrypt.genSalt(10)
+  usuario.password = await bcrypt.hash(req.body.password, salt)
+  usuario.token = null
+  await usuario.save()
+  res.render('auth/confirmar-cuenta', {
+    title: 'Password Reestablecido',
+    mensaje: 'El password se guardó correctamente'
   })
 }
 
@@ -110,5 +195,8 @@ export {
   formularioRegistro,
   formularioOlvidePassword,
   registrarUsuario,
-  confirmarToken
+  confirmarToken,
+  resetPassword,
+  comprobarToken,
+  nuevoPassword
 }
