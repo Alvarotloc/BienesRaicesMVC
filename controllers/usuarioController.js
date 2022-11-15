@@ -11,7 +11,8 @@ const formularioLogin = (req, res) => {
 
 const formularioRegistro = (req, res) => {
   res.render('auth/registro', {
-    title: 'Crea Tu Cuenta'
+    title: 'Crea Tu Cuenta',
+    csrfToken: req.csrfToken()
   })
 }
 
@@ -32,7 +33,8 @@ const registrarUsuario = async (req, res) => {
       usuario: {
         nombre: req.body.nombre,
         email: req.body.email
-      }
+      },
+      csrfToken: req.csrfToken()
     })
   }
 
@@ -48,7 +50,8 @@ const registrarUsuario = async (req, res) => {
       usuario: {
         nombre: req.body.nombre,
         email: req.body.email
-      }
+      },
+      csrfToken: req.csrfToken()
     })
   }
 
