@@ -1,5 +1,8 @@
 extends ../layout/index
 
+block styles
+    link(rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css")
+
 block contenido
     div(class='py-10')
         h1(class='text-4xl font-extrabold text-center') Bienes
@@ -16,7 +19,7 @@ block contenido
 
                         div.mb-5
                             label(class='block text-xs uppercase text-gray-500 mb-2 font-bold' for='titulo') Título de Anuncio
-                            input(type="text" id='titulo' name='titulo' class='w-full px-3 py-2 border border-slate-300 rounded' placeholder='Ingresa el título del anuncio')
+                            input(type="text" id='titulo' name='titulo' class='w-full px-3 py-2 border border-slate-300 rounded' placeholder='Título Propiedad, ej: Casa en la Playa')
 
                         div(class='md:flex md:gap-4')            
                             div(class='mb-5 md:w-1/2')
@@ -56,6 +59,20 @@ block contenido
                                         - let j = 1;
                                             while j < 5
                                                 option(value=j) #{j++}
+
+
+                        div(class='border-gray-200 border-t py-5 space-y-5')
+                            h3(class='text-lg leading-6 font-medium text-gray-90') Ubicación
+                            p(class='text-gray-600') Ubica la propiedad en el mapa
+                            div(id='mapa' class='h-96')
+
+
+                            div 
+                                p(class='calle')
+                            
+                            input(type="hidden" name='calle' id='calle')
+                            input(type="hidden" name='lat' id='lat')
+                            input(type="hidden" name='lng' id='lng')
 block scripts
     script(src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js")
     script(src="https://unpkg.com/esri-leaflet@3.0.8/dist/esri-leaflet.js")
