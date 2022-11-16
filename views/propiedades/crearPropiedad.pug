@@ -20,19 +20,25 @@ block contenido
                         div.mb-5
                             label(class='block text-xs uppercase text-gray-500 mb-2 font-bold' for='titulo') Título de Anuncio
                             input(type="text" id='titulo' name='titulo' class='w-full px-3 py-2 border border-slate-300 rounded' placeholder='Título Propiedad, ej: Casa en la Playa')
+                        div.mb-5
+                            label(class='block text-xs uppercase text-gray-500 mb-2 font-bold' for='descripcion') Descripción
+                            textarea(id='descripcion' name='descripcion' class='w-full px-3 py-2 border border-slate-300 rounded md:h-44' placeholder='Descripción de la propiedad')
 
                         div(class='md:flex md:gap-4')            
                             div(class='mb-5 md:w-1/2')
                                 label(class='block text-xs uppercase text-gray-500 mb-2 font-bold' for='categoria') Categoría
                                 select(id='categoria' name='categoria' class='w-full px-3 py-2 border border-slate-300 rounded')
                                     optgroup 
-                                        option(value="") - Seleccione - 
+                                        option(value="") - Seleccione -
+                                        each categoria in categorias 
+                                            option(value=categoria.id)= categoria.nombre 
                             div(class='mb-5 md:w-1/2')
                                 label(class='block text-xs uppercase text-gray-500 mb-2 font-bold' for='precio') Precio
                                 select(id='precio' name='precio' class='w-full px-3 py-2 border border-slate-300 rounded')
                                     optgroup 
                                         option(value="") - Seleccione - 
-
+                                        each precio in precios 
+                                            option(value=precio.id)= precio.precio 
 
                         div(class='md:flex md:gap-4')            
                             div(class='mb-5 md:w-1/3')

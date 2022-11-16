@@ -9,7 +9,9 @@
     "start": "node index",
     "css": "postcss public/css/tailwind.css -o public/css/app.css --watch",
     "js": "webpack --watch",
-    "comp": "concurrently \"npm run css\" \"npm run js\""
+    "comp": "concurrently \"npm run css\" \"npm run js\"",
+    "db:importar": "node ./seed/seeder.js -i",
+    "db:eliminar": "node ./seed/seeder.js -e"
   },
   "keywords": [
     "MVC",
