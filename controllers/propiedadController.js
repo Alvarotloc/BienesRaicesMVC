@@ -62,7 +62,6 @@ const guardarPropiedad = async (req, res) => {
       lng,
       precioId,
       categoriaId
-
     })
   } catch (error) {
     console.log(error)
