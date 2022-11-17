@@ -5,13 +5,14 @@ import {
   crearPropiedad,
   guardarPropiedad
 } from '../controllers/propiedadController.js'
+import protegerRuta from '../middleware/protegerRuta.js'
 
 const router = express.Router()
 
-router.get('/mis-propiedades', admin)
+router.get('/mis-propiedades', protegerRuta, admin)
 router.route('/propiedades/crear')
-  .get(crearPropiedad)
-  .post(
+  .get(protegerRuta, crearPropiedad)
+  .post(protegerRuta,
     body('titulo').notEmpty().withMessage('El título del anuncio es obligatorio'),
     body('descripcion').notEmpty().withMessage('La descripción del anuncio es obligatoria').isLength({ max: 200 }).withMessage('La descripción es muy larga (max 200ch)'),
     body('categoria').isNumeric().withMessage('Selecciona una categoría'),
