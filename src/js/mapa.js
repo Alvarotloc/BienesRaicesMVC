@@ -1,6 +1,6 @@
 (function () {
-  const lat = 40.4112419
-  const lng = -3.7082256
+  const lat = document.querySelector('#lat').value || 40.4112419
+  const lng = document.querySelector('#lng').value || -3.7082256
   const mapa = L.map('mapa').setView([lat, lng], 16)
 
   const geocodeService = L.esri.Geocoding.geocodeService()
