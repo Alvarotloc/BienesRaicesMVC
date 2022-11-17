@@ -3,9 +3,13 @@ import { body } from 'express-validator'
 import {
   admin,
   crearPropiedad,
-  guardarPropiedad
+  guardarPropiedad,
+  agregarImagen,
+  almacenarImagenes
 } from '../controllers/propiedadController.js'
+
 import protegerRuta from '../middleware/protegerRuta.js'
+import upload from '../middleware/subirImagen.js'
 
 const router = express.Router()
 
@@ -24,4 +28,7 @@ router.route('/propiedades/crear')
     guardarPropiedad
   )
 
+router.route('/propiedades/agregar-imagen/:id')
+  .get(protegerRuta, agregarImagen)
+  .post(protegerRuta, upload.array('imagen'), almacenarImagenes)
 export default router

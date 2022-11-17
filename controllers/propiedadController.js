@@ -6,8 +6,7 @@ import { Propiedad } from '../models/index.js'
 
 const admin = (req, res) => {
   res.render('propiedades/admin', {
-    title: 'Mis Propiedades',
-    header: true
+    title: 'Mis Propiedades'
   })
 }
 
@@ -19,7 +18,6 @@ const crearPropiedad = async (req, res) => {
 
   res.render('propiedades/crearPropiedad', {
     title: 'Crear Propiedad',
-    header: true,
     csrfToken: req.csrfToken(),
     categorias,
     precios,
@@ -39,7 +37,6 @@ const guardarPropiedad = async (req, res) => {
     ])
     return res.render('propiedades/crearPropiedad', {
       title: 'Crear Propiedad',
-      header: true,
       categorias,
       precios,
       csrfToken: req.csrfToken(),
@@ -75,8 +72,69 @@ const guardarPropiedad = async (req, res) => {
   }
 }
 
+const agregarImagen = async (req, res) => {
+  const { id } = req.params
+
+  // Validar que la propiedad exista
+  const propiedad = await Propiedad.findByPk(id)
+
+  if (!propiedad) {
+    return res.redirect('/mis-propiedades')
+  }
+
+  // Validar que la propiedad no esté publicada
+  if (propiedad.publicado) {
+    return res.redirect('/mis-propiedades')
+  }
+
+  // La propiedad pertenece a quien visita la pag
+  if (req.usuario.id.toString() !== propiedad.usuarioId.toString()) {
+    return res.redirect('/mis-propiedades')
+  }
+
+  res.render('propiedades/agregar-imagen', {
+    title: `Agregar Imagen: ${propiedad.titulo}`,
+    propiedad,
+    csrfToken: req.csrfToken()
+  })
+}
+
+const almacenarImagenes = async (req, res, next) => {
+  const { id } = req.params
+
+  // Validar que la propiedad exista
+  const propiedad = await Propiedad.findByPk(id)
+
+  if (!propiedad) {
+    return res.redirect('/mis-propiedades')
+  }
+
+  // Validar que la propiedad no esté publicada
+  if (propiedad.publicado) {
+    return res.redirect('/mis-propiedades')
+  }
+
+  // La propiedad pertenece a quien visita la pag
+  if (req.usuario.id.toString() !== propiedad.usuarioId.toString()) {
+    return res.redirect('/mis-propiedades')
+  }
+
+  try {
+    // Almacenar la imagen y publicar propiedad
+
+    propiedad.imagen = req.file.filename
+    propiedad.publicado = 1
+    await propiedad.save()
+    next()
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 export {
   admin,
   crearPropiedad,
-  guardarPropiedad
+  guardarPropiedad,
+  agregarImagen,
+  almacenarImagenes
 }
