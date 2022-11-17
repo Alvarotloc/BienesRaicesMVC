@@ -5,9 +5,10 @@ html(lang="en")
         meta(http-equiv="X-UA-Compatible", content="IE=edge")
         meta(name="viewport", content="width=device-width, initial-scale=1.0")
         title BienesRaices | #{title} 
-        link(rel="stylesheet", href="/css/app.css")
         block styles
+        link(rel="stylesheet", href="/css/app.css")
     body.min-h-screen.bg-slate-50
+        include includes/header-admin
         main(class='mx-auto container px-2')
             block contenido
         
