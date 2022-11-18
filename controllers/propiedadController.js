@@ -1,3 +1,5 @@
+import { unlink } from 'node:fs/promises'
+
 import { validationResult } from 'express-validator'
 
 import Categoria from '../models/Categoria.js'
@@ -19,7 +21,8 @@ const admin = async (req, res) => {
 
   res.render('propiedades/admin', {
     title: 'Mis Propiedades',
-    propiedades
+    propiedades,
+    csrfToken: req.csrfToken()
   })
 }
 
@@ -229,7 +232,25 @@ const editarPropiedad = async (req, res) => {
 }
 
 const eliminarPropiedad = async (req, res) => {
+  // Validación
+  const { id } = req.params
+  const { id: idUsuario } = req.usuario
+  const propiedad = await Propiedad.findByPk(id)
 
+  if (!propiedad) {
+    return res.redirect('/mis-propiedades')
+  }
+
+  // La propiedad pertenece a quien visita la pag
+  if (idUsuario.toString() !== propiedad.usuarioId.toString()) {
+    return res.redirect('/mis-propiedades')
+  }
+
+  // Eliminar imagen
+  await unlink(`public/uploads/${propiedad.imagen}`)
+
+  await propiedad.destroy()
+  return res.redirect('/mis-propiedades')
 }
 
 export {
