@@ -6,12 +6,12 @@ Dropzone.options.imagen = {
   dictDefaultMessage: 'Sube aquí tus imágenes',
   acceptedFiles: '.png,.jpg,.jpeg,.webp',
   maxFilesize: 5,
-  maxFiles: 5,
-  parallelUploads: 5,
+  maxFiles: 1,
+  parallelUploads: 1,
   autoProcessQueue: false,
   addRemoveLinks: true,
   dictRemoveFile: 'Borrar Archivo',
-  dictMaxFilesExceeded: 'El límite son 5 archivos',
+  dictMaxFilesExceeded: 'El límite es 1 archivo',
   headers: {
     'CSRF-Token': token
   },

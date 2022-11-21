@@ -5,7 +5,11 @@ import {
   crearPropiedad,
   guardarPropiedad,
   agregarImagen,
-  almacenarImagenes
+  almacenarImagenes,
+  formularioEditar,
+  editarPropiedad,
+  eliminarPropiedad,
+  mostrarPropiedad
 } from '../controllers/propiedadController.js'
 
 import protegerRuta from '../middleware/protegerRuta.js'
@@ -30,5 +34,25 @@ router.route('/propiedades/crear')
 
 router.route('/propiedades/agregar-imagen/:id')
   .get(protegerRuta, agregarImagen)
-  .post(protegerRuta, upload.array('imagen'), almacenarImagenes)
+  .post(protegerRuta, upload.single('imagen'), almacenarImagenes)
+
+router.route('/propiedades/editar/:id')
+  .get(protegerRuta, formularioEditar)
+  .post(protegerRuta,
+    body('titulo').notEmpty().withMessage('El título del anuncio es obligatorio'),
+    body('descripcion').notEmpty().withMessage('La descripción del anuncio es obligatoria').isLength({ max: 200 }).withMessage('La descripción es muy larga (max 200ch)'),
+    body('categoria').isNumeric().withMessage('Selecciona una categoría'),
+    body('precio').isNumeric().withMessage('Selecciona un rango de precio'),
+    body('habitaciones').isNumeric().withMessage('Selecciona un número de habitaciones'),
+    body('estacionamiento').isNumeric().withMessage('Selecciona un número de estacionamientos'),
+    body('banhos').isNumeric().withMessage('Selecciona un número de baños'),
+    body('lat').notEmpty().withMessage('Ubica la propiedad en el mapa'),
+    editarPropiedad)
+
+router.post('/propiedades/eliminar/:id', protegerRuta, eliminarPropiedad)
+
+// Área pública
+
+router.get('/propiedad/:id', mostrarPropiedad)
+
 export default router
