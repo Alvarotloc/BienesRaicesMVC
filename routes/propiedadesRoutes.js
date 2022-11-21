@@ -8,7 +8,8 @@ import {
   almacenarImagenes,
   formularioEditar,
   editarPropiedad,
-  eliminarPropiedad
+  eliminarPropiedad,
+  mostrarPropiedad
 } from '../controllers/propiedadController.js'
 
 import protegerRuta from '../middleware/protegerRuta.js'
@@ -49,5 +50,9 @@ router.route('/propiedades/editar/:id')
     editarPropiedad)
 
 router.post('/propiedades/eliminar/:id', protegerRuta, eliminarPropiedad)
+
+// Área pública
+
+router.get('/propiedad/:id', mostrarPropiedad)
 
 export default router
