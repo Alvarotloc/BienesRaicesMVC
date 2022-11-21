@@ -7,23 +7,55 @@ import Precio from '../models/Precio.js'
 import { Propiedad } from '../models/index.js'
 
 const admin = async (req, res) => {
-  const { id } = req.usuario
+  const { pagina: paginaActual } = req.query
 
-  const propiedades = await Propiedad.findAll({
-    where: {
-      usuarioId: id
-    },
-    include: [
-      { model: Categoria, as: 'categoria' },
-      { model: Precio, as: 'precio' }
-    ]
-  })
+  const regExp = /^[1-9]$/
 
-  res.render('propiedades/admin', {
-    title: 'Mis Propiedades',
-    propiedades,
-    csrfToken: req.csrfToken()
-  })
+  if (!regExp.test(paginaActual)) {
+    return res.redirect('/mis-propiedades?pagina=1')
+  }
+
+  try {
+    const { id } = req.usuario
+
+    // Límites y Offset para el paginador
+
+    const limit = 3
+
+    const offset = ((paginaActual * limit) - limit)
+
+    const [propiedades, cantidadPropiedades] = await Promise.all([
+      Propiedad.findAll({
+        limit,
+        offset,
+        where: {
+          usuarioId: id
+        },
+        include: [
+          { model: Categoria, as: 'categoria' },
+          { model: Precio, as: 'precio' }
+        ]
+      }),
+      Propiedad.count({
+        where: {
+          usuarioId: id
+        }
+      })
+    ])
+
+    res.render('propiedades/admin', {
+      title: 'Mis Propiedades',
+      propiedades,
+      csrfToken: req.csrfToken(),
+      paginas: Math.ceil(cantidadPropiedades / limit),
+      paginaActual,
+      cantidadPropiedades,
+      offset,
+      limit
+    })
+  } catch (error) {
+    console.log(error)
+  }
 }
 
 const crearPropiedad = async (req, res) => {
@@ -263,14 +295,7 @@ const mostrarPropiedad = async (req, res) => {
       { model: Precio, as: 'precio' }
     ]
   })
-  //   where: {
-  //     usuarioId: id
-  //   },
-  //   include: [
-  //     { model: Categoria, as: 'categoria' },
-  //     { model: Precio, as: 'precio' }
-  //   ]
-  // })
+
   if (!propiedad) {
     return res.redirect('/404')
   }
