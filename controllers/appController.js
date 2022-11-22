@@ -34,11 +34,34 @@ const inicio = async (req, res) => {
     pisos
   })
 }
-const categoria = (req, res) => {
+const categoria = async (req, res) => {
+  const { id } = req.params
+
+  // Comprobar que la categoria exista
+  const categoria = await Categoria.findByPk(id)
+  if (!categoria) {
+    return res.redirect('/404')
+  }
+
+  const propiedades = await Propiedad.findAll({
+    where: {
+      categoriaId: id
+    },
+    include: [
+      { model: Precio, as: 'precio' }
+    ]
+  })
+
+  res.render('categoria', {
+    title: `${categoria.nombre}s en Venta`,
+    propiedades
+  })
 }
 
 const pag404 = (req, res) => {
-
+  return res.render('404', {
+    title: 'Página no encontrada'
+  })
 }
 const buscador = (req, res) => {
 
