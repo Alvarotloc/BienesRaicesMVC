@@ -8,7 +8,24 @@ html(lang="en")
         block styles
         link(rel="stylesheet", href="/css/app.css")
     body.min-h-screen.bg-slate-50
-        include includes/header-app
+        if headerNoAutenticado
+            include includes/header-app
+        else 
+            include includes/header-admin
+            div(class='bg-indigo-700 py-5 px-5 hidden lg:block')
+                div(class='container mx-auto flex justify-between items-center')
+                    nav(class='space-x-5') 
+                        a(href="/categorias/1" class='text-sm font-bold uppercase text-white') Chalets 
+                        a(href="/categorias/2" class='text-sm font-bold uppercase text-white') Pisos 
+                        a(href="/categorias/3" class='text-sm font-bold uppercase text-white') Apartamentos 
+                        a(href="/categorias/4" class='text-sm font-bold uppercase text-white') Residencias 
+                        a(href="/categorias/5" class='text-sm font-bold uppercase text-white') Almacenes 
+                        a(href="/categorias/6" class='text-sm font-bold uppercase text-white') Terrenos
+                    form(action="/buscador" method='POST' class='flex gap-3 items-center')
+                        input(type="hidden" name='_csrf' value= csrfToken)
+                        label(for="termino" class='text-sm uppercase font-bold text-white') Búsqueda 
+                        input(type="text" id='termino' name='termino' placeholder='Buscar Propiedades' class='rounded-lg text-sm shadow p-2')
+                        input(type="submit" class='bg-indigo-800 hover:bg-indigo-600 transition-colors uppercase font-bold cursor-pointer rounded-lg text-white p-2' value='Buscar')   
         main(class='mx-auto container px-2')
             block contenido
         

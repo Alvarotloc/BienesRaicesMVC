@@ -27,6 +27,17 @@ const inicio = async (req, res) => {
     })
   ])
 
+  if (req.usuario === null) {
+    return res.render('inicio', {
+      title: 'Inicio',
+      categorias,
+      precios,
+      chalets,
+      pisos,
+      csrfToken: req.csrfToken(),
+      headerNoAutenticado: true
+    })
+  }
   res.render('inicio', {
     title: 'Inicio',
     categorias,
@@ -54,6 +65,15 @@ const categoria = async (req, res) => {
     ]
   })
 
+  if (req.usuario === null) {
+    return res.render('categoria', {
+      title: `${categoria.nombre}s en Venta`,
+      propiedades,
+      csrfToken: req.csrfToken(),
+      headerNoAutenticado: true
+    })
+  }
+
   res.render('categoria', {
     title: `${categoria.nombre}s en Venta`,
     propiedades,
@@ -62,6 +82,13 @@ const categoria = async (req, res) => {
 }
 
 const pag404 = (req, res) => {
+  if (req.usuario === null) {
+    return res.render('404', {
+      title: 'Página no encontrada',
+      csrfToken: req.csrfToken(),
+      headerNoAutenticado: true
+    })
+  }
   return res.render('404', {
     title: 'Página no encontrada',
     csrfToken: req.csrfToken()
@@ -86,6 +113,14 @@ const buscador = async (req, res) => {
       { model: Precio, as: 'precio' }
     ]
   })
+  if (req.usuario === null) {
+    return res.render('categoria', {
+      title: 'Resultados de la Búsqueda',
+      propiedades,
+      csrfToken: req.csrfToken(),
+      headerNoAutenticado: true
+    })
+  }
 
   res.render('categoria', {
     title: 'Resultados de la Búsqueda',

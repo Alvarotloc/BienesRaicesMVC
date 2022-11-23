@@ -326,6 +326,16 @@ const mostrarPropiedad = async (req, res) => {
     return res.redirect('/404')
   }
 
+  if (req.usuario === null) {
+    return res.render('propiedades/mostrar', {
+      propiedad,
+      headerNoAutenticado: true,
+      title: propiedad.titulo,
+      csrfToken: req.csrfToken(),
+      usuario: req.usuario,
+      esVendedor: esVendedor(req.usuario?.id, propiedad.usuarioId)
+    })
+  }
   res.render('propiedades/mostrar', {
     propiedad,
     title: propiedad.titulo,
@@ -372,6 +382,18 @@ const enviarMensaje = async (req, res) => {
     propiedadId,
     usuarioId
   })
+
+  if (req.usuario === null) {
+    return res.render('propiedades/mostrar', {
+      propiedad,
+      headerNoAutenticado: true,
+      title: propiedad.titulo,
+      csrfToken: req.csrfToken(),
+      usuario: req.usuario,
+      esVendedor: esVendedor(req.usuario?.id, propiedad.usuarioId),
+      enviado: true
+    })
+  }
 
   res.render('propiedades/mostrar', {
     propiedad,
