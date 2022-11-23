@@ -4,7 +4,8 @@ import { validationResult } from 'express-validator'
 
 import Categoria from '../models/Categoria.js'
 import Precio from '../models/Precio.js'
-import { Propiedad } from '../models/index.js'
+import { Propiedad, Mensaje, Usuario } from '../models/index.js'
+import { esVendedor, formatearFecha } from '../helpers/index.js'
 
 const admin = async (req, res) => {
   const { pagina: paginaActual } = req.query
@@ -33,7 +34,8 @@ const admin = async (req, res) => {
         },
         include: [
           { model: Categoria, as: 'categoria' },
-          { model: Precio, as: 'precio' }
+          { model: Precio, as: 'precio' },
+          { model: Mensaje, as: 'mensajes' }
         ]
       }),
       Propiedad.count({
@@ -289,6 +291,7 @@ const eliminarPropiedad = async (req, res) => {
 
 const mostrarPropiedad = async (req, res) => {
   const { id } = req.params
+
   const propiedad = await Propiedad.findByPk(id, {
     include: [
       { model: Categoria, as: 'categoria' },
@@ -299,10 +302,84 @@ const mostrarPropiedad = async (req, res) => {
   if (!propiedad) {
     return res.redirect('/404')
   }
+
   res.render('propiedades/mostrar', {
     propiedad,
     title: propiedad.titulo,
-    csrfToken: req.csrfToken()
+    csrfToken: req.csrfToken(),
+    usuario: req.usuario,
+    esVendedor: esVendedor(req.usuario?.id, propiedad.usuarioId)
+  })
+}
+
+const enviarMensaje = async (req, res) => {
+  const { id } = req.params
+
+  const propiedad = await Propiedad.findByPk(id, {
+    include: [
+      { model: Categoria, as: 'categoria' },
+      { model: Precio, as: 'precio' }
+    ]
+  })
+
+  if (!propiedad) {
+    return res.redirect('/404')
+  }
+
+  // Renderizar los errores en caso de tenerlos
+
+  const resultado = validationResult(req)
+
+  if (!resultado.isEmpty()) {
+    return res.render('propiedades/mostrar', {
+      propiedad,
+      title: propiedad.titulo,
+      csrfToken: req.csrfToken(),
+      usuario: req.usuario,
+      esVendedor: esVendedor(req.usuario?.id, propiedad.usuarioId),
+      errores: resultado.array()
+    })
+  }
+  const { mensaje } = req.body
+  const { id: propiedadId } = req.params
+  const { id: usuarioId } = req.usuario
+
+  await Mensaje.create({
+    mensaje,
+    propiedadId,
+    usuarioId
+  })
+
+  res.render('propiedades/mostrar', {
+    propiedad,
+    title: propiedad.titulo,
+    csrfToken: req.csrfToken(),
+    usuario: req.usuario,
+    esVendedor: esVendedor(req.usuario?.id, propiedad.usuarioId),
+    enviado: true
+  })
+}
+
+// Leer mensajes recibidos
+
+const verMensajes = async (req, res) => {
+  const { id } = req.params
+  const { id: usuarioId } = req.usuario
+  const propiedad = await Propiedad.findByPk(id, {
+    include: [
+      { model: Mensaje, as: 'mensajes', include: [{ model: Usuario.scope('eliminarPassword'), as: 'usuario' }] }
+    ]
+  })
+  if (!propiedad) {
+    return res.redirect('/mis-propiedades')
+  }
+  if (usuarioId !== propiedad.usuarioId) {
+    return res.redirect('/mis-propiedades')
+  }
+  res.render('propiedades/mensajes', {
+    title: 'Mensajes',
+    mensajes: propiedad.mensajes,
+    formatearFecha
   })
 }
 
@@ -315,5 +392,7 @@ export {
   formularioEditar,
   editarPropiedad,
   eliminarPropiedad,
-  mostrarPropiedad
+  mostrarPropiedad,
+  enviarMensaje,
+  verMensajes
 }
