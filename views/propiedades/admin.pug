@@ -1,5 +1,8 @@
 extends ../layout/admin
 
+block styles 
+    meta(name='csrf-token' content= csrfToken)
+
 block contenido
     div(class='py-10')
         h1(class='text-4xl font-extrabold text-center') Bienes
@@ -25,8 +28,7 @@ block contenido
                                         span(class='text-black font-bold')= propiedad.precio.precio
                                     a(href=`/mensajes/${propiedad.id}` class='text-sm text-gray-600 font-semibold hover:underline') #{propiedad.mensajes.length} Mensajes 
                                 div(class='sm:w-1/4 md:w-2/6 lg:flex-1 flex flex-col lg:flex-row gap-2') 
-                                    form(action='#')
-                                        input(type='submit' class=` w-full px-2 py-2 md:py-1 leading-5 font-semibold rounded cursor-pointer transition-colors ${propiedad.publicado ? 'bg-green-100 text-green-800 hover:bg-green-200 hover:text-green-900' : 'bg-red-100 text-yellow-800 hover:bg-yellow-200 hover:text-red-900'}` value=`${propiedad.publicado ? 'Publicado' : 'No Publicado'}`)
+                                    button(type='button' data-propiedad-id=`${propiedad.id}` class=`cambiar-estado whitespace-nowrap w-full px-2 py-2 md:py-1 leading-5 font-semibold rounded cursor-pointer transition-colors ${propiedad.publicado ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`)= `${propiedad.publicado ? 'Publicado' : 'No Publicado'}`
                                     
                                     a(href=`/propiedades/editar/${propiedad.id}` class='px-2 py-2 md:py-1 leading-5 font-semibold text-center rounded cursor-pointer bg-indigo-100 text-indigo-800 hover:text-indigo-900 hover:bg-indigo-200 transition-colors') Editar
 
@@ -52,3 +54,6 @@ block contenido
                                     a(href=`/mis-propiedades?pagina=${n}` class=`${paginaActual == n ? 'bg-indigo-50 border-indigo-500 text-indigo-600' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'} relative inline-flex items-center px-4 py-2 border text-sm font-medium`) #{n++} 
         else 
             p(class='text-center font-semibold') No Hay Propiedades Que Listar
+
+block scripts 
+    script(src="/js/cambiarEstado.js") 

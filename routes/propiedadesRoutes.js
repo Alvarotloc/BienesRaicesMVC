@@ -11,7 +11,8 @@ import {
   eliminarPropiedad,
   mostrarPropiedad,
   enviarMensaje,
-  verMensajes
+  verMensajes,
+  cambiarEstado
 } from '../controllers/propiedadController.js'
 
 import protegerRuta from '../middleware/protegerRuta.js'
@@ -53,6 +54,8 @@ router.route('/propiedades/editar/:id')
     editarPropiedad)
 
 router.post('/propiedades/eliminar/:id', protegerRuta, eliminarPropiedad)
+
+router.put('/propiedades/:id', protegerRuta, cambiarEstado)
 
 // Área pública
 

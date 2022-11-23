@@ -9,7 +9,8 @@ import {
   resetPassword,
   comprobarToken,
   nuevoPassword,
-  autenticarUsuario
+  autenticarUsuario,
+  cerrarSesion
 } from '../controllers/usuarioController.js'
 
 const router = express.Router()
@@ -18,6 +19,8 @@ router.get('/login', formularioLogin)
 router.route('/login')
   .get(formularioLogin)
   .post(autenticarUsuario)
+
+router.post('/cerrar-sesion', cerrarSesion)
 
 router.route('/registro')
   .get(formularioRegistro)
