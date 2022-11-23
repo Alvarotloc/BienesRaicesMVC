@@ -6,19 +6,20 @@ import {
   categoria,
   pag404
 } from '../controllers/appController.js'
+import identificarUsuario from '../middleware/identificarUsuario.js'
 
 const router = express.Router()
 
 // Página de Inicio
-router.get('/', inicio)
+router.get('/', identificarUsuario, inicio)
 
 // Categorías
-router.get('/categorias/:id', categoria)
+router.get('/categorias/:id', identificarUsuario, categoria)
 
 // Buscador
-router.post('/buscador', buscador)
+router.post('/buscador', identificarUsuario, buscador)
 
 // Página 404
-router.get('/404', pag404)
+router.get('/404', identificarUsuario, pag404)
 
 export default router
